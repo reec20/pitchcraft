@@ -1,11 +1,11 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: light;
+  color: #1f2937;
+  background-color: #f5f6f8;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,24 +15,27 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #2563eb;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: #1d4ed8;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+#root {
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+input,
+select {
+  font: inherit;
 }
 
 button {
@@ -42,27 +45,308 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #ffffff;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #93c5fd;
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 3px solid rgba(37, 99, 235, 0.24);
+  outline-offset: 2px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.desktop-only {
+  display: none;
+}
+
+.mobile-only {
+  display: block;
+}
+
+.chord4-site-header {
+  background: #f8f8f8;
+  border-bottom: 1px solid #ededed;
+  box-shadow: none;
+}
+
+.chord4-topbar-inner,
+.chord4-mobile-header {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.chord4-topbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 60px;
+  padding: 0 24px;
+}
+
+.chord4-logo {
+  background: #f60;
+  color: #fff !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-transform: lowercase;
+  border-radius: 2px;
+}
+
+.chord4-search-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chord4-search-form input {
+  border: 1px solid #c9c9c9;
+  border-radius: 0;
+  background: #ffffff;
+  color: #1f2937;
+  padding: 7px 12px;
+}
+
+.chord4-search-form input::placeholder {
+  color: #9ca3af;
+}
+
+.chord4-search-form button {
+  border-radius: 0;
+  border: 1px solid #f8f8f8;
+  background: #aaa;
+  color: #ffffff;
+  padding: 7px 16px;
+  font-size: 0.95rem;
+}
+
+.chord4-search-form button:hover {
+  border-color: #f8f8f8;
+  background: #f60;
+}
+
+.chord4-search-form-desktop {
+  flex: 1;
+  min-width: 220px;
+}
+
+.chord4-search-form-desktop input {
+  flex: 1;
+}
+
+.chord4-nav,
+.chord4-mobile-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chord4-nav a,
+.chord4-mobile-nav a,
+.chord4-chordsearch-entry {
+  color: #666;
+  border-radius: 0;
+  padding: 6px 8px;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.chord4-nav a:hover,
+.chord4-mobile-nav a:hover,
+.chord4-chordsearch-entry:hover {
+  color: #f60;
+  background: none;
+}
+
+.chord4-chordsearch-entry {
+  border: none;
+  color: #9a9a9a;
+  font-size: 12px;
+}
+
+.chord4-mobile-header {
+  padding: 10px 14px 16px;
+}
+
+.chord4-mobile-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.chord4-search-form-mobile {
+  margin-bottom: 12px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.chord4-search-form-mobile input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  padding: 10px 14px;
+}
+
+.chord4-search-form-mobile button {
+  border: none;
+  border-left: 1px solid #eee;
+  background: #f60;
+  padding: 10px 14px;
+}
+
+.chord4-mobile-nav {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chord4-mobile-nav a {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 20px;
+  padding: 2px 8px 6px 0;
+}
+
+.tuner-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tuner-hero-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.tuner-hero-links a {
+  color: #666;
+}
+
+.tuner-hero-links a:hover {
+  color: #f60;
+}
+
+.chord4-footer {
+  margin-top: 18px;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.chord4-footer a {
+  color: #4b5563;
+}
+
+.chord4-footer a:hover {
+  color: #111827;
+}
+
+.chord4-footer-desktop,
+.chord4-footer-mobile {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.chord4-footer-desktop {
+  padding: 40px 0 14px;
+}
+
+.chord4-referral-links {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-top: 6px;
+}
+
+.chord4-referral-links > span {
+  color: #111827;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.chord4-referral-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+
+.chord4-footer-meta p {
+  margin: 4px 0;
+  text-align: right;
+}
+
+.chord4-footer-mobile {
+  padding: 20px 0 28px;
+  text-align: left;
+}
+
+.chord4-footer-mobile p {
+  margin: 6px 0;
+  line-height: 1.7;
+}
+
+.instrument-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+.instrument-grid-secondary {
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+.tuner-content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .desktop-only {
+    display: block;
   }
-  a:hover {
-    color: #747bff;
+
+  .mobile-only {
+    display: none;
   }
-  button {
-    background-color: #f9f9f9;
+}
+
+@media (min-width: 1024px) {
+  .tuner-content-grid {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+  }
+}
+
+@media (max-width: 1023px) {
+  .chord4-referral-links {
+    flex-direction: column;
+  }
+
+  .tuner-hero-links {
+    font-size: 11px;
+  }
+
+  .chord4-footer-mobile {
+    padding-left: 2px;
+    padding-right: 2px;
   }
 }

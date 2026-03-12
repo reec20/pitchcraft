@@ -5,77 +5,85 @@ const NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const INSTRUMENTS = [
   {
     id: "guitar",
-    name: "Guitar",
+    name: "吉他",
     emoji: "🎸",
     tuning: ["E2", "A2", "D3", "G3", "B3", "E4"],
     color: "#FF6B35",
-    description: "Standard 6-string tuning",
+    description: "標準 6 弦調音",
     strings: 6,
   },
   {
     id: "bass",
-    name: "Bass",
+    name: "貝斯",
     emoji: "🎸",
     tuning: ["E1", "A1", "D2", "G2"],
     color: "#7B2FF7",
-    description: "Standard 4-string tuning",
+    description: "標準 4 弦調音",
     strings: 4,
   },
   {
     id: "ukulele",
-    name: "Ukulele",
+    name: "烏克麗麗",
     emoji: "🪕",
     tuning: ["G4", "C4", "E4", "A4"],
     color: "#00C9A7",
-    description: "Standard GCEA tuning",
+    description: "標準 GCEA 調音",
     strings: 4,
   },
   {
     id: "violin",
-    name: "Violin",
+    name: "小提琴",
     emoji: "🎻",
     tuning: ["G3", "D4", "A4", "E5"],
     color: "#C4375B",
-    description: "Standard tuning",
+    description: "標準調音",
     strings: 4,
   },
   {
     id: "cello",
-    name: "Cello",
+    name: "大提琴",
     emoji: "🎻",
     tuning: ["C2", "G2", "D3", "A3"],
     color: "#E8871E",
-    description: "Standard tuning",
+    description: "標準調音",
     strings: 4,
   },
   {
     id: "banjo",
-    name: "Banjo",
+    name: "班卓琴",
     emoji: "🪕",
     tuning: ["G4", "D3", "G3", "B3", "D4"],
     color: "#2D9CDB",
-    description: "Open G tuning",
+    description: "Open G 調音",
     strings: 5,
   },
   {
     id: "mandolin",
-    name: "Mandolin",
+    name: "曼陀林",
     emoji: "🪕",
     tuning: ["G3", "D4", "A4", "E5"],
     color: "#F2C94C",
-    description: "Standard tuning",
+    description: "標準調音",
     strings: 4,
   },
   {
     id: "chromatic",
-    name: "Chromatic",
+    name: "半音階",
     emoji: "🎵",
     tuning: [],
     color: "#56CCF2",
-    description: "All notes, any instrument",
+    description: "所有音高，適用任何樂器",
     strings: 0,
   },
 ];
+
+const PRIMARY_INSTRUMENT_IDS = ["guitar", "bass", "ukulele"];
+const PRIMARY_INSTRUMENTS = INSTRUMENTS.filter((instrument) =>
+  PRIMARY_INSTRUMENT_IDS.includes(instrument.id)
+);
+const SECONDARY_INSTRUMENTS = INSTRUMENTS.filter(
+  (instrument) => !PRIMARY_INSTRUMENT_IDS.includes(instrument.id)
+);
 
 const NOTE_FREQUENCIES = {};
 for (let octave = 0; octave <= 8; octave++) {
@@ -385,35 +393,45 @@ const InstrumentSVGs = {
   chromatic: ChromaticSVG,
 };
 
-// Accessibility: High contrast mode colors
-const themes = {
-  default: {
-    bg: "#0d0d12",
-    surface: "#16161f",
-    surfaceAlt: "#1e1e2a",
-    text: "#f0f0f5",
-    textMuted: "#8888a0",
-    border: "#2a2a3a",
-  },
-  highContrast: {
-    bg: "#000000",
-    surface: "#1a1a1a",
-    surfaceAlt: "#2a2a2a",
-    text: "#ffffff",
-    textMuted: "#cccccc",
-    border: "#ffffff",
-  },
+const theme = {
+  bg: "#f5f6f8",
+  surface: "#ffffff",
+  surfaceAlt: "#f7f8fa",
+  text: "#1f2937",
+  textMuted: "#6b7280",
+  border: "#e5e7eb",
+  shadow: "0 16px 40px rgba(15, 23, 42, 0.06)",
 };
+
+const CHORD4_SEARCH_URL = "https://chord4.com/zh-hant/search";
+const CHORD4_CHORDSEARCH_URL = "https://chord4.com/zh-hant/chordsearch";
+const CHORD4_NAV_LINKS = [
+  { label: "首頁", href: "https://chord4.com/zh-hant" },
+  { label: "廣場", href: "https://chord4.com/zh-hant/record/square" },
+  { label: "時刻", href: "https://chord4.com/zh-hant/time" },
+  { label: "譜單", href: "https://chord4.com/zh-hant/tablist" },
+  { label: "論壇區", href: "https://chord4.com/zh-hant/bbs/" },
+];
+const CHORD4_TOOL_LINKS = [
+  { label: "和弦搜尋", href: CHORD4_CHORDSEARCH_URL },
+  { label: "返回 Chord4 主站", href: "https://chord4.com/zh-hant" },
+];
+const CHORD4_REFERRAL_LINKS = [
+  { label: "吉他中國", href: "https://www.guitarworld.com.cn/" },
+  { label: "靠譜吉他小組", href: "https://www.douban.com/group/kaopujita/" },
+  { label: "吉他社", href: "https://www.jitashe.org/" },
+  { label: "和弦狗", href: "https://www.chordog.com/" },
+  { label: "音樂人網", href: "https://www.musicren.cn/" },
+  { label: "SendSplit", href: "https://sendsplit.com/" },
+  { label: "Coloringease", href: "https://coloringease.com/" },
+];
 
 export default function ChromaticTuner() {
   const [selectedInstrument, setSelectedInstrument] = useState(INSTRUMENTS[0]);
   const [isListening, setIsListening] = useState(false);
   const [detectedNote, setDetectedNote] = useState(null);
-  const [highContrast, setHighContrast] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [largeText, setLargeText] = useState(false);
   const [referenceA, setReferenceA] = useState(440);
-  const [showAccessibility, setShowAccessibility] = useState(false);
+  const [showMoreInstruments, setShowMoreInstruments] = useState(false);
   const [selectedString, setSelectedString] = useState(null);
   const [volume, setVolume] = useState(0);
 
@@ -422,9 +440,11 @@ export default function ChromaticTuner() {
   const streamRef = useRef(null);
   const animFrameRef = useRef(null);
 
-  const theme = highContrast ? themes.highContrast : themes.default;
-  const textScale = largeText ? 1.25 : 1;
-  const transition = reducedMotion ? "none" : "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
+  const textScale = 1;
+  const transition = "all 0.25s ease";
+  const secondaryExpanded = showMoreInstruments || SECONDARY_INSTRUMENTS.some(
+    (instrument) => instrument.id === selectedInstrument.id
+  );
 
   const autoCorrelate = useCallback((buf, sampleRate) => {
     let size = buf.length;
@@ -554,9 +574,9 @@ export default function ChromaticTuner() {
   const getCentsLabel = (cents) => {
     if (!cents && cents !== 0) return "";
     const abs = Math.abs(cents);
-    if (abs <= 5) return "In Tune!";
-    if (abs <= 15) return "Almost";
-    return cents > 0 ? "Too Sharp" : "Too Flat";
+    if (abs <= 5) return "音準準確";
+    if (abs <= 15) return "接近準確";
+    return cents > 0 ? "偏高" : "偏低";
   };
 
   const InstrumentIcon = InstrumentSVGs[selectedInstrument.id];
@@ -567,370 +587,353 @@ export default function ChromaticTuner() {
         minHeight: "100vh",
         background: theme.bg,
         color: theme.text,
-        fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace",
+        fontFamily:
+          '"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif',
         fontSize: `${14 * textScale}px`,
         transition,
         overflow: "auto",
       }}
     >
-      {/* Header */}
-      <header
-        style={{
-          padding: "20px 24px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: `1px solid ${theme.border}`,
-          flexWrap: "wrap",
-          gap: "12px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: "10px",
-              background: `linear-gradient(135deg, ${selectedInstrument.color}, ${selectedInstrument.color}88)`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "18px",
-              transition,
-            }}
-            aria-hidden="true"
-          >
-            ♪
-          </div>
-          <div>
-            <h1
-              style={{
-                margin: 0,
-                fontSize: `${18 * textScale}px`,
-                fontWeight: 700,
-                letterSpacing: "-0.02em",
-              }}
+      <header className="chord4-site-header">
+        <div className="chord4-topbar desktop-only">
+          <div className="chord4-topbar-inner">
+            <a className="chord4-logo" href="https://chord4.com/zh-hant">
+              chord4
+            </a>
+            <form
+              action={CHORD4_SEARCH_URL}
+              method="get"
+              target="_blank"
+              className="chord4-search-form chord4-search-form-desktop"
             >
-              PitchCraft
-            </h1>
-            <p
-              style={{
-                margin: 0,
-                fontSize: `${11 * textScale}px`,
-                color: theme.textMuted,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}
-            >
-              Open Source Chromatic Tuner
-            </p>
+              <input
+                name="search_text"
+                type="text"
+                maxLength="60"
+                placeholder="搜尋歌手或歌名..."
+                aria-label="搜尋歌手或歌名"
+              />
+              <button type="submit">搜 索</button>
+            </form>
+            <nav className="chord4-nav" aria-label="Chord4 主選單">
+              {CHORD4_NAV_LINKS.map((link) => (
+                <a key={link.href} href={link.href}>
+                  {link.label}
+                </a>
+              ))}
+            </nav>
+            <a className="chord4-chordsearch-entry" href={CHORD4_CHORDSEARCH_URL}>
+              和弦搜尋
+            </a>
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          {/* Reference pitch */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              background: theme.surfaceAlt,
-              borderRadius: "8px",
-              padding: "6px 12px",
-              border: `1px solid ${theme.border}`,
-            }}
-          >
-            <label
-              htmlFor="ref-pitch"
-              style={{ fontSize: `${11 * textScale}px`, color: theme.textMuted }}
-            >
-              A4
-            </label>
-            <select
-              id="ref-pitch"
-              value={referenceA}
-              onChange={(e) => setReferenceA(Number(e.target.value))}
-              aria-label="Reference pitch for A4"
-              style={{
-                background: "transparent",
-                border: "none",
-                color: theme.text,
-                fontSize: `${13 * textScale}px`,
-                fontFamily: "inherit",
-                cursor: "pointer",
-                outline: "none",
-              }}
-            >
-              {[432, 435, 438, 440, 442, 444].map((hz) => (
-                <option key={hz} value={hz} style={{ background: theme.surface }}>
-                  {hz} Hz
-                </option>
-              ))}
-            </select>
+        <div className="chord4-mobile-header mobile-only">
+          <div className="chord4-mobile-brand-row">
+            <a className="chord4-logo" href="https://chord4.com/zh-hant">
+              chord4
+            </a>
           </div>
-
-          {/* Accessibility toggle */}
-          <button
-            onClick={() => setShowAccessibility(!showAccessibility)}
-            aria-label="Accessibility settings"
-            aria-expanded={showAccessibility}
-            style={{
-              width: 38,
-              height: 38,
-              borderRadius: "10px",
-              border: `1px solid ${theme.border}`,
-              background: showAccessibility ? selectedInstrument.color + "22" : theme.surfaceAlt,
-              color: showAccessibility ? selectedInstrument.color : theme.text,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: `${18 * textScale}px`,
-              transition,
-            }}
+          <form
+            action={CHORD4_SEARCH_URL}
+            method="get"
+            target="_blank"
+            className="chord4-search-form chord4-search-form-mobile"
           >
-            ♿
-          </button>
+            <input
+              name="search_text"
+              type="search"
+              placeholder="搜尋歌手或歌名..."
+              aria-label="搜尋歌手或歌名"
+            />
+            <button type="submit">搜索</button>
+          </form>
+          <nav className="chord4-mobile-nav" aria-label="Chord4 手機主選單">
+            {CHORD4_NAV_LINKS.map((link) => (
+              <a key={link.href} href={link.href}>
+                {link.label}
+              </a>
+            ))}
+            <a href={CHORD4_CHORDSEARCH_URL}>和弦搜尋</a>
+          </nav>
         </div>
       </header>
 
-      {/* Accessibility Panel */}
-      {showAccessibility && (
-        <div
-          role="region"
-          aria-label="Accessibility settings"
+      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px" }}>
+        <section
           style={{
-            padding: "16px 24px",
-            background: theme.surfaceAlt,
-            borderBottom: `1px solid ${theme.border}`,
+            background: theme.surface,
+            borderRadius: "22px",
+            border: `1px solid ${theme.border}`,
+            padding: "24px 28px",
+            marginBottom: "24px",
             display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             gap: "16px",
             flexWrap: "wrap",
-            alignItems: "center",
+            boxShadow: theme.shadow,
           }}
         >
-          <span
-            style={{
-              fontSize: `${12 * textScale}px`,
-              color: theme.textMuted,
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              fontWeight: 600,
-            }}
-          >
-            Accessibility
-          </span>
-          {[
-            { label: "High Contrast", state: highContrast, setter: setHighContrast },
-            { label: "Reduced Motion", state: reducedMotion, setter: setReducedMotion },
-            { label: "Large Text", state: largeText, setter: setLargeText },
-          ].map(({ label, state, setter }) => (
-            <button
-              key={label}
-              onClick={() => setter(!state)}
-              role="switch"
-              aria-checked={state}
-              aria-label={label}
+          <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: "14px",
+                background: `linear-gradient(135deg, ${selectedInstrument.color}, ${selectedInstrument.color}bb)`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontSize: "20px",
+                flexShrink: 0,
+              }}
+              aria-hidden="true"
+            >
+              ♪
+            </div>
+            <div>
+              <h1
+                style={{
+                  margin: 0,
+                  fontSize: `${28 * textScale}px`,
+                  fontWeight: 800,
+                  letterSpacing: "-0.03em",
+                }}
+              >
+                Chord4 調音器
+              </h1>
+              <p
+                style={{
+                  margin: "4px 0 0",
+                  fontSize: `${13 * textScale}px`,
+                  color: theme.textMuted,
+                }}
+              >
+                延續 Chord4 主站導覽體驗，提供簡潔白底的本機麥克風調音工具。
+              </p>
+              <div className="tuner-hero-links">
+                {CHORD4_TOOL_LINKS.map((link) => (
+                  <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
+                    {link.label}
+                  </a>
+                ))}
+                <span>歌譜搜尋將另開新分頁</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="tuner-hero-actions">
+            <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
-                padding: "8px 14px",
-                borderRadius: "8px",
-                border: `1px solid ${state ? selectedInstrument.color : theme.border}`,
-                background: state ? selectedInstrument.color + "22" : "transparent",
-                color: state ? selectedInstrument.color : theme.text,
-                cursor: "pointer",
-                fontSize: `${13 * textScale}px`,
-                fontFamily: "inherit",
-                transition,
+                gap: "6px",
+                background: theme.surfaceAlt,
+                borderRadius: "10px",
+                padding: "8px 12px",
+                border: `1px solid ${theme.border}`,
               }}
             >
-              <span
+              <label
+                htmlFor="ref-pitch"
+                style={{ fontSize: `${12 * textScale}px`, color: theme.textMuted }}
+              >
+                A4 基準
+              </label>
+              <select
+                id="ref-pitch"
+                value={referenceA}
+                onChange={(e) => setReferenceA(Number(e.target.value))}
+                aria-label="A4 基準音高"
                 style={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: 4,
-                  border: `2px solid ${state ? selectedInstrument.color : theme.textMuted}`,
-                  background: state ? selectedInstrument.color : "transparent",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition,
+                  background: "transparent",
+                  border: "none",
+                  color: theme.text,
+                  fontSize: `${13 * textScale}px`,
+                  fontFamily: "inherit",
+                  cursor: "pointer",
+                  outline: "none",
                 }}
               >
-                {state && (
-                  <span style={{ color: "#fff", fontSize: "10px", lineHeight: 1 }}>✓</span>
-                )}
-              </span>
-              {label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "24px" }}>
-        {/* Instrument Selector */}
-        <section aria-label="Instrument selection">
-          <h2 className="sr-only" style={{ position: "absolute", left: "-9999px" }}>
-            Select Instrument
-          </h2>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
-              gap: "10px",
-              marginBottom: "32px",
-            }}
-          >
-            {INSTRUMENTS.map((inst) => {
-              const isActive = selectedInstrument.id === inst.id;
-              const SVGComponent = InstrumentSVGs[inst.id];
-              return (
-                <button
-                  key={inst.id}
-                  onClick={() => {
-                    setSelectedInstrument(inst);
-                    setSelectedString(null);
-                  }}
-                  aria-pressed={isActive}
-                  aria-label={`${inst.name}: ${inst.description}`}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "8px",
-                    padding: "14px 8px",
-                    borderRadius: "14px",
-                    border: `2px solid ${isActive ? inst.color : theme.border}`,
-                    background: isActive ? inst.color + "15" : theme.surface,
-                    color: isActive ? inst.color : theme.text,
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                    transition,
-                    position: "relative",
-                    overflow: "hidden",
-                  }}
-                >
-                  {isActive && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: "3px",
-                        background: inst.color,
-                        borderRadius: "2px 2px 0 0",
-                      }}
-                    />
-                  )}
-                  <div style={{ width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <SVGComponent color={isActive ? inst.color : theme.textMuted} size={48} />
-                  </div>
-                  <span
-                    style={{
-                      fontSize: `${12 * textScale}px`,
-                      fontWeight: isActive ? 700 : 500,
-                      letterSpacing: "0.02em",
-                    }}
-                  >
-                    {inst.name}
-                  </span>
-                </button>
-              );
-            })}
+                {[432, 435, 438, 440, 442, 444].map((hz) => (
+                  <option key={hz} value={hz} style={{ background: theme.surface }}>
+                    {hz} Hz
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </section>
 
-        {/* Selected Instrument Detail */}
-        <section
-          aria-label={`${selectedInstrument.name} details`}
-          style={{
-            background: theme.surface,
-            borderRadius: "20px",
-            border: `1px solid ${theme.border}`,
-            padding: "28px",
-            marginBottom: "24px",
-            display: "flex",
-            gap: "28px",
-            alignItems: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          <div
-            style={{
-              background: selectedInstrument.color + "10",
-              borderRadius: "16px",
-              padding: "12px",
-              border: `1px solid ${selectedInstrument.color}22`,
-              flexShrink: 0,
-            }}
-          >
-            <InstrumentIcon color={selectedInstrument.color} size={100} />
-          </div>
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <h2
-              style={{
-                margin: "0 0 4px 0",
-                fontSize: `${22 * textScale}px`,
-                fontWeight: 800,
-                color: selectedInstrument.color,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              {selectedInstrument.name}
-            </h2>
-            <p
-              style={{
-                margin: "0 0 16px 0",
-                color: theme.textMuted,
-                fontSize: `${13 * textScale}px`,
-              }}
-            >
-              {selectedInstrument.description}
-            </p>
+        <section aria-label="樂器選擇">
+          <h2 className="sr-only" style={{ position: "absolute", left: "-9999px" }}>
+            選擇樂器
+          </h2>
 
-            {/* String buttons */}
-            {selectedInstrument.tuning.length > 0 && (
-              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                {selectedInstrument.tuning.map((note, i) => {
-                  const isSelected = selectedString === i;
+          <div style={{ marginBottom: "32px" }}>
+            <div className="instrument-grid">
+              {PRIMARY_INSTRUMENTS.map((inst) => {
+                const isActive = selectedInstrument.id === inst.id;
+                const SVGComponent = InstrumentSVGs[inst.id];
+
+                return (
+                  <button
+                    key={inst.id}
+                    onClick={() => {
+                      setSelectedInstrument(inst);
+                      setSelectedString(null);
+                    }}
+                    aria-pressed={isActive}
+                    aria-label={`${inst.name}：${inst.description}`}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "14px 8px",
+                      borderRadius: "14px",
+                      border: `2px solid ${isActive ? inst.color : theme.border}`,
+                      background: isActive ? inst.color + "12" : theme.surface,
+                      color: isActive ? inst.color : theme.text,
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                      transition,
+                      position: "relative",
+                      overflow: "hidden",
+                      boxShadow: isActive ? "none" : theme.shadow,
+                    }}
+                  >
+                    {isActive && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: "3px",
+                          background: inst.color,
+                          borderRadius: "2px 2px 0 0",
+                        }}
+                      />
+                    )}
+                    <div
+                      style={{
+                        width: 48,
+                        height: 48,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <SVGComponent color={isActive ? inst.color : theme.textMuted} size={48} />
+                    </div>
+                    <span
+                      style={{
+                        fontSize: `${12 * textScale}px`,
+                        fontWeight: isActive ? 700 : 500,
+                        letterSpacing: "0.02em",
+                      }}
+                    >
+                      {inst.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{ marginTop: "14px" }}>
+              <button
+                onClick={() => setShowMoreInstruments((value) => !value)}
+                aria-expanded={secondaryExpanded}
+                aria-controls="more-instruments-panel"
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "999px",
+                  border: `1px solid ${theme.border}`,
+                  background: theme.surface,
+                  color: theme.text,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  fontSize: `${13 * textScale}px`,
+                  boxShadow: theme.shadow,
+                  transition,
+                }}
+              >
+                {secondaryExpanded ? "收合更多樂器" : "更多樂器"}
+              </button>
+            </div>
+
+            {secondaryExpanded && (
+              <div
+                id="more-instruments-panel"
+                className="instrument-grid instrument-grid-secondary"
+                style={{ marginTop: "14px" }}
+              >
+                {SECONDARY_INSTRUMENTS.map((inst) => {
+                  const isActive = selectedInstrument.id === inst.id;
+                  const SVGComponent = InstrumentSVGs[inst.id];
+
                   return (
                     <button
-                      key={i}
+                      key={inst.id}
                       onClick={() => {
-                        setSelectedString(i);
-                        playTone(getNoteFrequency(note));
+                        setSelectedInstrument(inst);
+                        setSelectedString(null);
                       }}
-                      aria-label={`String ${i + 1}: ${note}. Click to hear reference tone`}
+                      aria-pressed={isActive}
+                      aria-label={`${inst.name}：${inst.description}`}
                       style={{
-                        padding: "8px 16px",
-                        borderRadius: "10px",
-                        border: `2px solid ${isSelected ? selectedInstrument.color : theme.border}`,
-                        background: isSelected ? selectedInstrument.color + "25" : theme.surfaceAlt,
-                        color: isSelected ? selectedInstrument.color : theme.text,
-                        cursor: "pointer",
-                        fontFamily: "inherit",
-                        fontSize: `${14 * textScale}px`,
-                        fontWeight: 700,
-                        transition,
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        gap: "2px",
-                        minWidth: 52,
+                        gap: "8px",
+                        padding: "14px 8px",
+                        borderRadius: "14px",
+                        border: `2px solid ${isActive ? inst.color : theme.border}`,
+                        background: isActive ? inst.color + "12" : theme.surface,
+                        color: isActive ? inst.color : theme.text,
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        transition,
+                        position: "relative",
+                        overflow: "hidden",
+                        boxShadow: isActive ? "none" : theme.shadow,
                       }}
                     >
-                      <span>{note}</span>
-                      <span
+                      {isActive && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: "3px",
+                            background: inst.color,
+                            borderRadius: "2px 2px 0 0",
+                          }}
+                        />
+                      )}
+                      <div
                         style={{
-                          fontSize: `${9 * textScale}px`,
-                          color: theme.textMuted,
-                          fontWeight: 400,
+                          width: 48,
+                          height: 48,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
                       >
-                        {Math.round(getNoteFrequency(note))} Hz
+                        <SVGComponent color={isActive ? inst.color : theme.textMuted} size={48} />
+                      </div>
+                      <span
+                        style={{
+                          fontSize: `${12 * textScale}px`,
+                          fontWeight: isActive ? 700 : 500,
+                          letterSpacing: "0.02em",
+                        }}
+                      >
+                        {inst.name}
                       </span>
                     </button>
                   );
@@ -940,300 +943,423 @@ export default function ChromaticTuner() {
           </div>
         </section>
 
-        {/* Tuner Display */}
-        <section
-          aria-label="Tuner display"
-          aria-live="polite"
-          style={{
-            background: theme.surface,
-            borderRadius: "20px",
-            border: `1px solid ${theme.border}`,
-            padding: "32px",
-            textAlign: "center",
-            marginBottom: "24px",
-          }}
-        >
-          {/* Cents meter */}
-          <div
-            style={{
-              position: "relative",
-              height: 12,
-              borderRadius: 6,
-              background: theme.surfaceAlt,
-              overflow: "hidden",
-              marginBottom: "28px",
-              border: `1px solid ${theme.border}`,
-            }}
-            role="meter"
-            aria-label={detectedNote ? `Tuning: ${detectedNote.cents} cents ${detectedNote.cents > 0 ? "sharp" : "flat"}` : "Waiting for input"}
-            aria-valuemin={-50}
-            aria-valuemax={50}
-            aria-valuenow={detectedNote ? detectedNote.cents : 0}
-          >
-            {/* Center marker */}
-            <div
-              style={{
-                position: "absolute",
-                left: "50%",
-                top: 0,
-                bottom: 0,
-                width: 2,
-                background: "#22c55e",
-                transform: "translateX(-50%)",
-                zIndex: 2,
-              }}
-            />
-            {/* Green zone */}
-            <div
-              style={{
-                position: "absolute",
-                left: "45%",
-                width: "10%",
-                top: 0,
-                bottom: 0,
-                background: "#22c55e20",
-                zIndex: 1,
-              }}
-            />
-            {/* Indicator */}
-            {detectedNote && (
-              <div
-                style={{
-                  position: "absolute",
-                  left: `${50 + detectedNote.cents}%`,
-                  top: -2,
-                  bottom: -2,
-                  width: 8,
-                  borderRadius: 4,
-                  background: getCentsColor(detectedNote.cents),
-                  transform: "translateX(-50%)",
-                  transition: reducedMotion ? "none" : "left 0.1s ease",
-                  zIndex: 3,
-                  boxShadow: `0 0 12px ${getCentsColor(detectedNote.cents)}88`,
-                }}
-              />
-            )}
-            {/* Tick marks */}
-            {[-40, -30, -20, -10, 0, 10, 20, 30, 40].map((tick) => (
-              <div
-                key={tick}
-                style={{
-                  position: "absolute",
-                  left: `${50 + tick}%`,
-                  top: tick === 0 ? 0 : "30%",
-                  bottom: tick === 0 ? 0 : "30%",
-                  width: 1,
-                  background: theme.textMuted + "44",
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Detected Note */}
-          <div style={{ marginBottom: "8px" }}>
-            <span
-              style={{
-                fontSize: `${72 * textScale}px`,
-                fontWeight: 900,
-                color: detectedNote ? getCentsColor(detectedNote.cents) : theme.textMuted + "44",
-                letterSpacing: "-0.04em",
-                lineHeight: 1,
-                transition,
-                textShadow: detectedNote
-                  ? `0 0 40px ${getCentsColor(detectedNote.cents)}44`
-                  : "none",
-              }}
-            >
-              {detectedNote ? detectedNote.note : "—"}
-            </span>
-            <span
-              style={{
-                fontSize: `${28 * textScale}px`,
-                color: theme.textMuted,
-                fontWeight: 600,
-                verticalAlign: "super",
-              }}
-            >
-              {detectedNote ? detectedNote.octave : ""}
-            </span>
-          </div>
-
-          {/* Frequency & Status */}
-          <div style={{ marginBottom: "4px" }}>
-            <span
-              style={{
-                fontSize: `${16 * textScale}px`,
-                color: theme.textMuted,
-                fontFamily: "inherit",
-              }}
-            >
-              {detectedNote ? `${detectedNote.frequency.toFixed(1)} Hz` : "Play a note..."}
-            </span>
-          </div>
+        <div className="tuner-content-grid">
           <div>
-            <span
+            <section
+              aria-label={`${selectedInstrument.name} 詳細資訊`}
               style={{
-                fontSize: `${14 * textScale}px`,
-                fontWeight: 700,
-                color: detectedNote ? getCentsColor(detectedNote.cents) : "transparent",
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
+                background: theme.surface,
+                borderRadius: "20px",
+                border: `1px solid ${theme.border}`,
+                padding: "28px",
+                marginBottom: "24px",
+                display: "flex",
+                gap: "28px",
+                alignItems: "center",
+                flexWrap: "wrap",
+                boxShadow: theme.shadow,
               }}
             >
-              {detectedNote ? getCentsLabel(detectedNote.cents) : "."}
-            </span>
-            {detectedNote && (
-              <span
+              <div
                 style={{
-                  display: "block",
-                  fontSize: `${12 * textScale}px`,
-                  color: theme.textMuted,
-                  marginTop: "4px",
+                  background: selectedInstrument.color + "10",
+                  borderRadius: "16px",
+                  padding: "12px",
+                  border: `1px solid ${selectedInstrument.color}22`,
+                  flexShrink: 0,
                 }}
               >
-                {detectedNote.cents > 0 ? "+" : ""}
-                {detectedNote.cents} cents
-              </span>
-            )}
-          </div>
-
-          {/* Volume indicator */}
-          {isListening && (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: "3px",
-                marginTop: "20px",
-                alignItems: "flex-end",
-                height: 20,
-              }}
-              aria-label={`Input volume: ${Math.round(volume * 100)}%`}
-            >
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div
-                  key={i}
+                <InstrumentIcon color={selectedInstrument.color} size={100} />
+              </div>
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <h2
                   style={{
-                    width: 4,
-                    height: `${Math.max(4, (i < volume * 12 ? (i + 1) / 12 : 0.15) * 20)}px`,
-                    borderRadius: 2,
-                    background:
-                      i < volume * 12 ? selectedInstrument.color : theme.surfaceAlt,
-                    transition: reducedMotion ? "none" : "height 0.1s, background 0.1s",
+                    margin: "0 0 4px 0",
+                    fontSize: `${22 * textScale}px`,
+                    fontWeight: 800,
+                    color: selectedInstrument.color,
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  {selectedInstrument.name}
+                </h2>
+                <p
+                  style={{
+                    margin: "0 0 16px 0",
+                    color: theme.textMuted,
+                    fontSize: `${13 * textScale}px`,
+                  }}
+                >
+                  {selectedInstrument.description}
+                </p>
+
+                {selectedInstrument.tuning.length > 0 && (
+                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                    {selectedInstrument.tuning.map((note, i) => {
+                      const isSelected = selectedString === i;
+
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setSelectedString(i);
+                            playTone(getNoteFrequency(note));
+                          }}
+                          aria-label={`第 ${i + 1} 弦：${note}，點擊可播放參考音`}
+                          style={{
+                            padding: "8px 16px",
+                            borderRadius: "10px",
+                            border: `2px solid ${isSelected ? selectedInstrument.color : theme.border}`,
+                            background: isSelected ? selectedInstrument.color + "22" : theme.surfaceAlt,
+                            color: isSelected ? selectedInstrument.color : theme.text,
+                            cursor: "pointer",
+                            fontFamily: "inherit",
+                            fontSize: `${14 * textScale}px`,
+                            fontWeight: 700,
+                            transition,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "2px",
+                            minWidth: 52,
+                          }}
+                        >
+                          <span>{note}</span>
+                          <span
+                            style={{
+                              fontSize: `${9 * textScale}px`,
+                              color: theme.textMuted,
+                              fontWeight: 400,
+                            }}
+                          >
+                            {Math.round(getNoteFrequency(note))} Hz
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </section>
+
+            <section
+              aria-label="調音器顯示區"
+              aria-live="polite"
+              style={{
+                background: theme.surface,
+                borderRadius: "20px",
+                border: `1px solid ${theme.border}`,
+                padding: "32px",
+                textAlign: "center",
+                marginBottom: "24px",
+                boxShadow: theme.shadow,
+              }}
+            >
+              <div
+                style={{
+                  position: "relative",
+                  height: 12,
+                  borderRadius: 6,
+                  background: theme.surfaceAlt,
+                  overflow: "hidden",
+                  marginBottom: "28px",
+                  border: `1px solid ${theme.border}`,
+                }}
+                role="meter"
+                aria-label={
+                  detectedNote
+                    ? `音準：${detectedNote.cents} 音分，${detectedNote.cents > 0 ? "偏高" : "偏低"}`
+                    : "等待聲音輸入"
+                }
+                aria-valuemin={-50}
+                aria-valuemax={50}
+                aria-valuenow={detectedNote ? detectedNote.cents : 0}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "50%",
+                    top: 0,
+                    bottom: 0,
+                    width: 2,
+                    background: "#22c55e",
+                    transform: "translateX(-50%)",
+                    zIndex: 2,
                   }}
                 />
-              ))}
-            </div>
-          )}
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "45%",
+                    width: "10%",
+                    top: 0,
+                    bottom: 0,
+                    background: "#22c55e20",
+                    zIndex: 1,
+                  }}
+                />
+                {detectedNote && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: `${50 + detectedNote.cents}%`,
+                      top: -2,
+                      bottom: -2,
+                      width: 8,
+                      borderRadius: 4,
+                      background: getCentsColor(detectedNote.cents),
+                      transform: "translateX(-50%)",
+                      transition: "left 0.1s ease",
+                      zIndex: 3,
+                      boxShadow: `0 0 12px ${getCentsColor(detectedNote.cents)}88`,
+                    }}
+                  />
+                )}
+                {[-40, -30, -20, -10, 0, 10, 20, 30, 40].map((tick) => (
+                  <div
+                    key={tick}
+                    style={{
+                      position: "absolute",
+                      left: `${50 + tick}%`,
+                      top: tick === 0 ? 0 : "30%",
+                      bottom: tick === 0 ? 0 : "30%",
+                      width: 1,
+                      background: theme.textMuted + "44",
+                    }}
+                  />
+                ))}
+              </div>
 
-          {/* Start/Stop Button */}
-          <button
-            onClick={isListening ? stopListening : startListening}
-            aria-label={isListening ? "Stop tuner" : "Start tuner — requires microphone access"}
-            style={{
-              marginTop: "28px",
-              padding: "14px 40px",
-              borderRadius: "14px",
-              border: "none",
-              background: isListening
-                ? "#ef4444"
-                : `linear-gradient(135deg, ${selectedInstrument.color}, ${selectedInstrument.color}cc)`,
-              color: "#fff",
-              fontSize: `${16 * textScale}px`,
-              fontWeight: 700,
-              fontFamily: "inherit",
-              cursor: "pointer",
-              letterSpacing: "0.04em",
-              boxShadow: isListening
-                ? "0 4px 24px #ef444444"
-                : `0 4px 24px ${selectedInstrument.color}44`,
-              transition,
-            }}
-          >
-            {isListening ? "■  STOP" : "●  START TUNER"}
-          </button>
-        </section>
-
-        {/* Quick Tips */}
-        <section
-          aria-label="Tips"
-          style={{
-            background: theme.surface,
-            borderRadius: "16px",
-            border: `1px solid ${theme.border}`,
-            padding: "20px 24px",
-            marginBottom: "24px",
-          }}
-        >
-          <h3
-            style={{
-              margin: "0 0 12px 0",
-              fontSize: `${13 * textScale}px`,
-              fontWeight: 700,
-              color: theme.textMuted,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-            }}
-          >
-            How to Use
-          </h3>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-              gap: "12px",
-            }}
-          >
-            {[
-              { icon: "🎯", text: "Select your instrument or use Chromatic mode for any pitch" },
-              { icon: "🎤", text: "Click Start Tuner and allow microphone access" },
-              { icon: "🎵", text: "Play a note — the meter shows if you're sharp or flat" },
-              { icon: "🔊", text: "Tap any string button to hear the correct reference tone" },
-            ].map((tip, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  gap: "10px",
-                  alignItems: "flex-start",
-                  padding: "10px",
-                  borderRadius: "10px",
-                  background: theme.surfaceAlt,
-                }}
-              >
-                <span style={{ fontSize: "20px", flexShrink: 0 }} aria-hidden="true">
-                  {tip.icon}
+              <div style={{ marginBottom: "8px" }}>
+                <span
+                  style={{
+                    fontSize: `${72 * textScale}px`,
+                    fontWeight: 900,
+                    color: detectedNote ? getCentsColor(detectedNote.cents) : theme.textMuted + "44",
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1,
+                    transition,
+                    textShadow: detectedNote
+                      ? `0 0 40px ${getCentsColor(detectedNote.cents)}22`
+                      : "none",
+                  }}
+                >
+                  {detectedNote ? detectedNote.note : "—"}
                 </span>
                 <span
                   style={{
-                    fontSize: `${12 * textScale}px`,
+                    fontSize: `${28 * textScale}px`,
                     color: theme.textMuted,
-                    lineHeight: 1.5,
+                    fontWeight: 600,
+                    verticalAlign: "super",
                   }}
                 >
-                  {tip.text}
+                  {detectedNote ? detectedNote.octave : ""}
                 </span>
               </div>
-            ))}
-          </div>
-        </section>
 
-        {/* Footer */}
-        <footer
-          style={{
-            textAlign: "center",
-            padding: "20px 0 40px",
-            color: theme.textMuted,
-            fontSize: `${11 * textScale}px`,
-            letterSpacing: "0.06em",
-          }}
-        >
-          <p style={{ margin: 0 }}>
-            PitchCraft — Open Source Chromatic Tuner · MIT License
-          </p>
-          <p style={{ margin: "6px 0 0", opacity: 0.6 }}>
-            Built with accessibility in mind · Keyboard navigable · Screen reader compatible
-          </p>
+              <div style={{ marginBottom: "4px" }}>
+                <span
+                  style={{
+                    fontSize: `${16 * textScale}px`,
+                    color: theme.textMuted,
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {detectedNote ? `${detectedNote.frequency.toFixed(1)} Hz` : "請彈奏一個音"}
+                </span>
+              </div>
+              <div>
+                <span
+                  style={{
+                    fontSize: `${14 * textScale}px`,
+                    fontWeight: 700,
+                    color: detectedNote ? getCentsColor(detectedNote.cents) : "transparent",
+                    letterSpacing: "0.04em",
+                  }}
+                >
+                  {detectedNote ? getCentsLabel(detectedNote.cents) : "."}
+                </span>
+                {detectedNote && (
+                  <span
+                    style={{
+                      display: "block",
+                      fontSize: `${12 * textScale}px`,
+                      color: theme.textMuted,
+                      marginTop: "4px",
+                    }}
+                  >
+                    {detectedNote.cents > 0 ? "+" : ""}
+                    {detectedNote.cents} 音分
+                  </span>
+                )}
+              </div>
+
+              {isListening && (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "3px",
+                    marginTop: "20px",
+                    alignItems: "flex-end",
+                    height: 20,
+                  }}
+                  aria-label={`輸入音量：${Math.round(volume * 100)}%`}
+                >
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        width: 4,
+                        height: `${Math.max(4, (i < volume * 12 ? (i + 1) / 12 : 0.15) * 20)}px`,
+                        borderRadius: 2,
+                        background:
+                          i < volume * 12 ? selectedInstrument.color : theme.surfaceAlt,
+                        transition: "height 0.1s, background 0.1s",
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={isListening ? stopListening : startListening}
+                aria-label={isListening ? "停止調音" : "開始調音，需要麥克風權限"}
+                style={{
+                  marginTop: "28px",
+                  padding: "14px 40px",
+                  borderRadius: "14px",
+                  border: "none",
+                  background: isListening
+                    ? "#ef4444"
+                    : `linear-gradient(135deg, ${selectedInstrument.color}, ${selectedInstrument.color}cc)`,
+                  color: "#fff",
+                  fontSize: `${16 * textScale}px`,
+                  fontWeight: 700,
+                  fontFamily: "inherit",
+                  cursor: "pointer",
+                  letterSpacing: "0.04em",
+                  boxShadow: isListening
+                    ? "0 4px 24px #ef444444"
+                    : `0 4px 24px ${selectedInstrument.color}33`,
+                  transition,
+                }}
+              >
+                {isListening ? "■ 停止調音" : "● 開始調音"}
+              </button>
+            </section>
+          </div>
+
+          <aside>
+            <section
+              aria-label="Tips"
+              style={{
+                background: theme.surface,
+                borderRadius: "16px",
+                border: `1px solid ${theme.border}`,
+                padding: "20px 24px",
+                marginBottom: "24px",
+                boxShadow: theme.shadow,
+                position: "sticky",
+                top: 24,
+              }}
+            >
+              <h3
+                style={{
+                  margin: "0 0 12px 0",
+                  fontSize: `${13 * textScale}px`,
+                  fontWeight: 700,
+                  color: theme.textMuted,
+                  letterSpacing: "0.04em",
+                }}
+              >
+                使用提示
+              </h3>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr",
+                  gap: "12px",
+                }}
+              >
+                {[
+                  { icon: "🎯", text: "預設提供吉他、貝斯與烏克麗麗，其餘樂器可從更多樂器展開。" },
+                  { icon: "🎤", text: "點擊開始調音並允許瀏覽器存取本機麥克風。" },
+                  { icon: "🎵", text: "彈奏單音後，中央指示條會顯示目前偏高或偏低。" },
+                  { icon: "🔊", text: "點擊弦音按鈕可播放對應參考音，方便快速校準。" },
+                ].map((tip, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      alignItems: "flex-start",
+                      padding: "12px",
+                      borderRadius: "12px",
+                      background: theme.surfaceAlt,
+                    }}
+                  >
+                    <span style={{ fontSize: "20px", flexShrink: 0 }} aria-hidden="true">
+                      {tip.icon}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: `${12 * textScale}px`,
+                        color: theme.textMuted,
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {tip.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </aside>
+        </div>
+
+        <footer className="chord4-footer">
+          <div className="desktop-only chord4-footer-desktop">
+            <div className="chord4-referral-links">
+              <span>友情鏈接：</span>
+              <div className="chord4-referral-list">
+                {CHORD4_REFERRAL_LINKS.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="nofollow ugc noreferrer"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="chord4-footer-meta">
+              <p>免責聲明！本站內容僅供吉他愛好者學習之用。聯繫方式：contact@chord4.com</p>
+              <p>
+                <a href="https://chord4.com/sitemap.xml">網站地圖</a>
+                <span> / chord4.com / designed by reecho @2012-2026</span>
+              </p>
+              <p>
+                <a href={CHORD4_CHORDSEARCH_URL}>和弦搜尋</a>
+                <span> / 基於 PitchCraft 開源專案改作 · 保留 PitchCraft 引用資訊 · MIT License</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="mobile-only chord4-footer-mobile">
+            <p>
+              chord4.com手機版本 /
+              <a href="https://chord4.com/sitemap.xml">網站地圖</a>
+              /
+              <a href={CHORD4_CHORDSEARCH_URL}>和弦搜尋</a>
+              /@2012-2026
+            </p>
+            <p>基於 PitchCraft 開源專案改作 · PitchCraft · MIT License</p>
+          </div>
         </footer>
       </div>
     </div>
