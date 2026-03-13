@@ -704,23 +704,6 @@ export default function ChromaticTuner() {
               >
                 Chord4 調音器
               </h1>
-              <p
-                style={{
-                  margin: "4px 0 0",
-                  fontSize: `${13 * textScale}px`,
-                  color: theme.textMuted,
-                }}
-              >
-                延續 Chord4 主站導覽體驗，提供簡潔白底的本機麥克風調音工具。
-              </p>
-              <div className="tuner-hero-links">
-                {CHORD4_TOOL_LINKS.map((link) => (
-                  <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
-                    {link.label}
-                  </a>
-                ))}
-                <span>歌譜搜尋將另開新分頁</span>
-              </div>
             </div>
           </div>
 
