@@ -811,9 +811,6 @@ export default function ChromaticTuner() {
                 </a>
               ))}
             </nav>
-            <a className="chord4-chordsearch-entry" href={siteConfig.chordsearchUrl}>
-              {copy.nav.chordsearch}
-            </a>
           </div>
         </div>
 
@@ -893,23 +890,6 @@ export default function ChromaticTuner() {
               >
                 {copy.siteName}
               </h1>
-              <p
-                style={{
-                  margin: "4px 0 0",
-                  fontSize: `${13 * textScale}px`,
-                  color: theme.textMuted,
-                }}
-              >
-                {copy.heroDescription}
-              </p>
-              <div className="tuner-hero-links">
-                {siteConfig.toolLinks.map((link) => (
-                  <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
-                    {link.label}
-                  </a>
-                ))}
-                <span>{copy.heroSearchHint}</span>
-              </div>
             </div>
           </div>
 
@@ -1532,10 +1512,6 @@ export default function ChromaticTuner() {
                 <a href="https://chord4.com/sitemap.xml">{copy.sitemap}</a>
                 <span>{copy.designedBy}</span>
               </p>
-              <p>
-                <a href={siteConfig.chordsearchUrl}>{copy.nav.chordsearch}</a>
-                <span>{copy.openSource}</span>
-              </p>
             </div>
           </div>
 
@@ -1543,8 +1519,6 @@ export default function ChromaticTuner() {
             <p>
               {copy.mobileVersion} /
               <a href="https://chord4.com/sitemap.xml">{copy.sitemap}</a>
-              /
-              <a href={siteConfig.chordsearchUrl}>{copy.nav.chordsearch}</a>
               /@2012-2026
             </p>
             <p>{copy.mobileOpenSource}</p>
