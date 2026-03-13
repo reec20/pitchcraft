@@ -839,8 +839,7 @@ export default function ChromaticTuner() {
               <a key={link.href} href={link.href}>
                 {link.label}
               </a>
-            ))}
-            <a href={siteConfig.chordsearchUrl}>{copy.nav.chordsearch}</a>
+            ))}            
           </nav>
         </div>
       </header>
