@@ -622,9 +622,6 @@ export default function ChromaticTuner() {
                 </a>
               ))}
             </nav>
-            <a className="chord4-chordsearch-entry" href={CHORD4_CHORDSEARCH_URL}>
-              和弦搜尋
-            </a>
           </div>
         </div>
 
@@ -648,14 +645,6 @@ export default function ChromaticTuner() {
             />
             <button type="submit">搜索</button>
           </form>
-          <nav className="chord4-mobile-nav" aria-label="Chord4 手機主選單">
-            {CHORD4_NAV_LINKS.map((link) => (
-              <a key={link.href} href={link.href}>
-                {link.label}
-              </a>
-            ))}
-            <a href={CHORD4_CHORDSEARCH_URL}>和弦搜尋</a>
-          </nav>
         </div>
       </header>
 
