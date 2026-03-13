@@ -2,88 +2,279 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 const NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
-const INSTRUMENTS = [
+const INSTRUMENT_DEFINITIONS = [
   {
     id: "guitar",
-    name: "吉他",
     emoji: "🎸",
     tuning: ["E2", "A2", "D3", "G3", "B3", "E4"],
     color: "#FF6B35",
-    description: "標準 6 弦調音",
     strings: 6,
   },
   {
     id: "bass",
-    name: "貝斯",
     emoji: "🎸",
     tuning: ["E1", "A1", "D2", "G2"],
     color: "#7B2FF7",
-    description: "標準 4 弦調音",
     strings: 4,
   },
   {
     id: "ukulele",
-    name: "烏克麗麗",
     emoji: "🪕",
     tuning: ["G4", "C4", "E4", "A4"],
     color: "#00C9A7",
-    description: "標準 GCEA 調音",
     strings: 4,
   },
   {
     id: "violin",
-    name: "小提琴",
     emoji: "🎻",
     tuning: ["G3", "D4", "A4", "E5"],
     color: "#C4375B",
-    description: "標準調音",
     strings: 4,
   },
   {
     id: "cello",
-    name: "大提琴",
     emoji: "🎻",
     tuning: ["C2", "G2", "D3", "A3"],
     color: "#E8871E",
-    description: "標準調音",
     strings: 4,
   },
   {
     id: "banjo",
-    name: "班卓琴",
     emoji: "🪕",
     tuning: ["G4", "D3", "G3", "B3", "D4"],
     color: "#2D9CDB",
-    description: "Open G 調音",
     strings: 5,
   },
   {
     id: "mandolin",
-    name: "曼陀林",
     emoji: "🪕",
     tuning: ["G3", "D4", "A4", "E5"],
     color: "#F2C94C",
-    description: "標準調音",
     strings: 4,
   },
   {
     id: "chromatic",
-    name: "半音階",
     emoji: "🎵",
     tuning: [],
     color: "#56CCF2",
-    description: "所有音高，適用任何樂器",
     strings: 0,
   },
 ];
 
 const PRIMARY_INSTRUMENT_IDS = ["guitar", "bass", "ukulele"];
-const PRIMARY_INSTRUMENTS = INSTRUMENTS.filter((instrument) =>
-  PRIMARY_INSTRUMENT_IDS.includes(instrument.id)
-);
-const SECONDARY_INSTRUMENTS = INSTRUMENTS.filter(
-  (instrument) => !PRIMARY_INSTRUMENT_IDS.includes(instrument.id)
-);
+
+const COPY = {
+  "zh-Hant": {
+    documentTitle: "Chord4調音器",
+    siteName: "Chord4 調音器",
+    searchPlaceholder: "搜尋歌手或歌名...",
+    searchButton: "搜尋",
+    nav: {
+      home: "首頁",
+      square: "廣場",
+      time: "時刻",
+      tablist: "譜單",
+      bbs: "論壇區",
+      chordsearch: "和弦搜尋",
+      backToSite: "返回 Chord4 主站",
+    },
+    mainMenu: "Chord4 主選單",
+    heroDescription: "延續 Chord4 主站導覽體驗，提供簡潔白底的本機麥克風調音工具。",
+    heroSearchHint: "歌譜搜尋將另開新分頁",
+    referencePitch: "A4 基準",
+    referencePitchAria: "A4 基準音高",
+    instrumentSection: "樂器選擇",
+    selectInstrument: "選擇樂器",
+    moreInstruments: "更多樂器",
+    collapseInstruments: "收合更多樂器",
+    detailsSuffix: "詳細資訊",
+    stringLabel: (index, note) => `第 ${index + 1} 弦：${note}，點擊可播放參考音`,
+    tunerDisplay: "調音器顯示區",
+    tuningStatus: (cents) => `音準：${cents} 音分，${cents > 0 ? "偏高" : "偏低"}`,
+    waitingForInput: "等待聲音輸入",
+    playPrompt: "請彈奏一個音",
+    volumeLabel: (volume) => `輸入音量：${Math.round(volume * 100)}%`,
+    startTuner: "● 開始調音",
+    stopTuner: "■ 停止調音",
+    startTunerAria: "開始調音，需要麥克風權限",
+    stopTunerAria: "停止調音",
+    tipsAria: "提示",
+    tipsTitle: "使用提示",
+    tips: [
+      "預設提供吉他、貝斯與烏克麗麗，其餘樂器可從更多樂器展開。",
+      "點擊開始調音並允許瀏覽器存取本機麥克風。",
+      "彈奏單音後，中央指示條會顯示目前偏高或偏低。",
+      "點擊弦音按鈕可播放對應參考音，方便快速校準。",
+    ],
+    footerLinksLabel: "友情鏈接：",
+    disclaimer: "免責聲明！本站內容僅供吉他愛好者學習之用。聯繫方式：contact@chord4.com",
+    sitemap: "網站地圖",
+    mobileVersion: "chord4.com手機版本",
+    designedBy: " / chord4.com / designed by reecho @2012-2026",
+    openSource: " / 基於 PitchCraft 開源專案改作 · 保留 PitchCraft 引用資訊 · MIT License",
+    mobileOpenSource: "基於 PitchCraft 開源專案改作 · PitchCraft · MIT License",
+    centsLabels: {
+      inTune: "音準準確",
+      almost: "接近準確",
+      sharp: "偏高",
+      flat: "偏低",
+    },
+    instruments: {
+      guitar: { name: "吉他", description: "標準 6 弦調音" },
+      bass: { name: "貝斯", description: "標準 4 弦調音" },
+      ukulele: { name: "烏克麗麗", description: "標準 GCEA 調音" },
+      violin: { name: "小提琴", description: "標準調音" },
+      cello: { name: "大提琴", description: "標準調音" },
+      banjo: { name: "班卓琴", description: "Open G 調音" },
+      mandolin: { name: "曼陀林", description: "標準調音" },
+      chromatic: { name: "半音階", description: "所有音高，適用任何樂器" },
+    },
+  },
+  "zh-Hans": {
+    documentTitle: "Chord4调音器",
+    siteName: "Chord4 调音器",
+    searchPlaceholder: "搜索歌手或歌名...",
+    searchButton: "搜索",
+    nav: {
+      home: "首页",
+      square: "广场",
+      time: "时刻",
+      tablist: "谱单",
+      bbs: "论坛区",
+      chordsearch: "和弦搜索",
+      backToSite: "返回 Chord4 主站",
+    },
+    mainMenu: "Chord4 主菜单",
+    heroDescription: "延续 Chord4 主站导航体验，提供简洁白底的本机麦克风调音工具。",
+    heroSearchHint: "歌谱搜索将另开新分页",
+    referencePitch: "A4 基准",
+    referencePitchAria: "A4 基准音高",
+    instrumentSection: "乐器选择",
+    selectInstrument: "选择乐器",
+    moreInstruments: "更多乐器",
+    collapseInstruments: "收起更多乐器",
+    detailsSuffix: "详细信息",
+    stringLabel: (index, note) => `第 ${index + 1} 弦：${note}，点击可播放参考音`,
+    tunerDisplay: "调音器显示区",
+    tuningStatus: (cents) => `音准：${cents} 音分，${cents > 0 ? "偏高" : "偏低"}`,
+    waitingForInput: "等待声音输入",
+    playPrompt: "请弹奏一个音",
+    volumeLabel: (volume) => `输入音量：${Math.round(volume * 100)}%`,
+    startTuner: "● 开始调音",
+    stopTuner: "■ 停止调音",
+    startTunerAria: "开始调音，需要麦克风权限",
+    stopTunerAria: "停止调音",
+    tipsAria: "提示",
+    tipsTitle: "使用提示",
+    tips: [
+      "默认提供吉他、贝斯与尤克里里，其余乐器可从更多乐器展开。",
+      "点击开始调音并允许浏览器访问本机麦克风。",
+      "弹奏单音后，中央指示条会显示当前偏高或偏低。",
+      "点击弦音按钮可播放对应参考音，方便快速校准。",
+    ],
+    footerLinksLabel: "友情链接：",
+    disclaimer: "免责声明！本站内容仅供吉他爱好者学习之用。联系方式：contact@chord4.com",
+    sitemap: "网站地图",
+    mobileVersion: "chord4.com手机版本",
+    designedBy: " / chord4.com / designed by reecho @2012-2026",
+    openSource: " / 基于 PitchCraft 开源项目改作 · 保留 PitchCraft 引用信息 · MIT License",
+    mobileOpenSource: "基于 PitchCraft 开源项目改作 · PitchCraft · MIT License",
+    centsLabels: {
+      inTune: "音准准确",
+      almost: "接近准确",
+      sharp: "偏高",
+      flat: "偏低",
+    },
+    instruments: {
+      guitar: { name: "吉他", description: "标准 6 弦调音" },
+      bass: { name: "贝斯", description: "标准 4 弦调音" },
+      ukulele: { name: "尤克里里", description: "标准 GCEA 调音" },
+      violin: { name: "小提琴", description: "标准调音" },
+      cello: { name: "大提琴", description: "标准调音" },
+      banjo: { name: "班卓琴", description: "Open G 调音" },
+      mandolin: { name: "曼陀林", description: "标准调音" },
+      chromatic: { name: "半音阶", description: "所有音高，适用于任何乐器" },
+    },
+  },
+};
+
+const CHORD4_REFERRAL_LINKS = [
+  {
+    key: "guitarChina",
+    href: "https://www.guitarworld.com.cn/",
+    labels: { "zh-Hant": "吉他中國", "zh-Hans": "吉他中国" },
+  },
+  {
+    key: "kaopu",
+    href: "https://www.douban.com/group/kaopujita/",
+    labels: { "zh-Hant": "靠譜吉他小組", "zh-Hans": "靠谱吉他小组" },
+  },
+  {
+    key: "jitashe",
+    href: "https://www.jitashe.org/",
+    labels: { "zh-Hant": "吉他社", "zh-Hans": "吉他社" },
+  },
+  {
+    key: "chordog",
+    href: "https://www.chordog.com/",
+    labels: { "zh-Hant": "和弦狗", "zh-Hans": "和弦狗" },
+  },
+  {
+    key: "musicren",
+    href: "https://www.musicren.cn/",
+    labels: { "zh-Hant": "音樂人網", "zh-Hans": "音乐人网" },
+  },
+  {
+    key: "sendsplit",
+    href: "https://sendsplit.com/",
+    labels: { "zh-Hant": "SendSplit", "zh-Hans": "SendSplit" },
+  },
+  {
+    key: "coloringease",
+    href: "https://coloringease.com/",
+    labels: { "zh-Hant": "Coloringease", "zh-Hans": "Coloringease" },
+  },
+];
+
+function detectLocale() {
+  if (typeof window === "undefined") return "zh-Hant";
+
+  const queryLang = new URLSearchParams(window.location.search).get("lang")?.toLowerCase();
+  if (queryLang === "zh-hans" || queryLang === "zh-cn" || queryLang === "zh-sg") {
+    return "zh-Hans";
+  }
+  if (queryLang === "zh-hant" || queryLang === "zh-tw" || queryLang === "zh-hk") {
+    return "zh-Hant";
+  }
+
+  const language = (navigator.languages?.[0] || navigator.language || "").toLowerCase();
+  if (language.includes("hans") || /^zh-(cn|sg)/.test(language)) return "zh-Hans";
+  if (language.startsWith("zh")) return "zh-Hant";
+
+  return "zh-Hant";
+}
+
+function getSiteConfig(locale, copy) {
+  const prefix = locale === "zh-Hans" ? "" : "/zh-hant";
+  const baseUrl = `https://chord4.com${prefix}`;
+
+  return {
+    baseUrl,
+    searchUrl: `${baseUrl}/search`,
+    chordsearchUrl: `${baseUrl}/chordsearch`,
+    navLinks: [
+      { key: "home", label: copy.nav.home, href: baseUrl },
+      { key: "square", label: copy.nav.square, href: `${baseUrl}/record/square` },
+      { key: "time", label: copy.nav.time, href: `${baseUrl}/time` },
+      { key: "tablist", label: copy.nav.tablist, href: `${baseUrl}/tablist` },
+      { key: "bbs", label: copy.nav.bbs, href: `${baseUrl}/bbs/` },
+    ],
+    toolLinks: [
+      { key: "chordsearch", label: copy.nav.chordsearch, href: `${baseUrl}/chordsearch` },
+      { key: "backToSite", label: copy.nav.backToSite, href: baseUrl },
+    ],
+  };
+}
 
 const NOTE_FREQUENCIES = {};
 for (let octave = 0; octave <= 8; octave++) {
@@ -403,31 +594,23 @@ const theme = {
   shadow: "0 16px 40px rgba(15, 23, 42, 0.06)",
 };
 
-const CHORD4_SEARCH_URL = "https://chord4.com/zh-hant/search";
-const CHORD4_CHORDSEARCH_URL = "https://chord4.com/zh-hant/chordsearch";
-const CHORD4_NAV_LINKS = [
-  { label: "首頁", href: "https://chord4.com/zh-hant" },
-  { label: "廣場", href: "https://chord4.com/zh-hant/record/square" },
-  { label: "時刻", href: "https://chord4.com/zh-hant/time" },
-  { label: "譜單", href: "https://chord4.com/zh-hant/tablist" },
-  { label: "論壇區", href: "https://chord4.com/zh-hant/bbs/" },
-];
-const CHORD4_TOOL_LINKS = [
-  { label: "和弦搜尋", href: CHORD4_CHORDSEARCH_URL },
-  { label: "返回 Chord4 主站", href: "https://chord4.com/zh-hant" },
-];
-const CHORD4_REFERRAL_LINKS = [
-  { label: "吉他中國", href: "https://www.guitarworld.com.cn/" },
-  { label: "靠譜吉他小組", href: "https://www.douban.com/group/kaopujita/" },
-  { label: "吉他社", href: "https://www.jitashe.org/" },
-  { label: "和弦狗", href: "https://www.chordog.com/" },
-  { label: "音樂人網", href: "https://www.musicren.cn/" },
-  { label: "SendSplit", href: "https://sendsplit.com/" },
-  { label: "Coloringease", href: "https://coloringease.com/" },
-];
-
 export default function ChromaticTuner() {
-  const [selectedInstrument, setSelectedInstrument] = useState(INSTRUMENTS[0]);
+  const [locale] = useState(detectLocale);
+  const copy = COPY[locale];
+  const siteConfig = getSiteConfig(locale, copy);
+  const instruments = INSTRUMENT_DEFINITIONS.map((instrument) => ({
+    ...instrument,
+    name: copy.instruments[instrument.id].name,
+    description: copy.instruments[instrument.id].description,
+  }));
+  const primaryInstruments = instruments.filter((instrument) =>
+    PRIMARY_INSTRUMENT_IDS.includes(instrument.id)
+  );
+  const secondaryInstruments = instruments.filter(
+    (instrument) => !PRIMARY_INSTRUMENT_IDS.includes(instrument.id)
+  );
+
+  const [selectedInstrumentId, setSelectedInstrumentId] = useState(INSTRUMENT_DEFINITIONS[0].id);
   const [isListening, setIsListening] = useState(false);
   const [detectedNote, setDetectedNote] = useState(null);
   const [referenceA, setReferenceA] = useState(440);
@@ -442,7 +625,8 @@ export default function ChromaticTuner() {
 
   const textScale = 1;
   const transition = "all 0.25s ease";
-  const secondaryExpanded = showMoreInstruments || SECONDARY_INSTRUMENTS.some(
+  const selectedInstrument = instruments.find((instrument) => instrument.id === selectedInstrumentId) || instruments[0];
+  const secondaryExpanded = showMoreInstruments || secondaryInstruments.some(
     (instrument) => instrument.id === selectedInstrument.id
   );
 
@@ -540,6 +724,11 @@ export default function ChromaticTuner() {
     return () => stopListening();
   }, [stopListening]);
 
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.title = copy.documentTitle;
+  }, [copy.documentTitle, locale]);
+
   // Play reference tone
   const playTone = useCallback((freq) => {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -574,9 +763,9 @@ export default function ChromaticTuner() {
   const getCentsLabel = (cents) => {
     if (!cents && cents !== 0) return "";
     const abs = Math.abs(cents);
-    if (abs <= 5) return "音準準確";
-    if (abs <= 15) return "接近準確";
-    return cents > 0 ? "偏高" : "偏低";
+    if (abs <= 5) return copy.centsLabels.inTune;
+    if (abs <= 15) return copy.centsLabels.almost;
+    return cents > 0 ? copy.centsLabels.sharp : copy.centsLabels.flat;
   };
 
   const InstrumentIcon = InstrumentSVGs[selectedInstrument.id];
@@ -597,11 +786,11 @@ export default function ChromaticTuner() {
       <header className="chord4-site-header">
         <div className="chord4-topbar desktop-only">
           <div className="chord4-topbar-inner">
-            <a className="chord4-logo" href="https://chord4.com/zh-hant">
+            <a className="chord4-logo" href={siteConfig.baseUrl}>
               chord4
             </a>
             <form
-              action={CHORD4_SEARCH_URL}
+              action={siteConfig.searchUrl}
               method="get"
               target="_blank"
               className="chord4-search-form chord4-search-form-desktop"
@@ -610,29 +799,32 @@ export default function ChromaticTuner() {
                 name="search_text"
                 type="text"
                 maxLength="60"
-                placeholder="搜尋歌手或歌名..."
-                aria-label="搜尋歌手或歌名"
+                placeholder={copy.searchPlaceholder}
+                aria-label={copy.searchPlaceholder}
               />
-              <button type="submit">搜 索</button>
+              <button type="submit">{copy.searchButton}</button>
             </form>
-            <nav className="chord4-nav" aria-label="Chord4 主選單">
-              {CHORD4_NAV_LINKS.map((link) => (
+            <nav className="chord4-nav" aria-label={copy.mainMenu}>
+              {siteConfig.navLinks.map((link) => (
                 <a key={link.href} href={link.href}>
                   {link.label}
                 </a>
               ))}
             </nav>
+            <a className="chord4-chordsearch-entry" href={siteConfig.chordsearchUrl}>
+              {copy.nav.chordsearch}
+            </a>
           </div>
         </div>
 
         <div className="chord4-mobile-header mobile-only">
           <div className="chord4-mobile-brand-row">
-            <a className="chord4-logo" href="https://chord4.com/zh-hant">
+            <a className="chord4-logo" href={siteConfig.baseUrl}>
               chord4
             </a>
           </div>
           <form
-            action={CHORD4_SEARCH_URL}
+            action={siteConfig.searchUrl}
             method="get"
             target="_blank"
             className="chord4-search-form chord4-search-form-mobile"
@@ -640,11 +832,19 @@ export default function ChromaticTuner() {
             <input
               name="search_text"
               type="search"
-              placeholder="搜尋歌手或歌名..."
-              aria-label="搜尋歌手或歌名"
+              placeholder={copy.searchPlaceholder}
+              aria-label={copy.searchPlaceholder}
             />
-            <button type="submit">搜索</button>
+            <button type="submit">{copy.searchButton}</button>
           </form>
+          <nav className="chord4-mobile-nav" aria-label={copy.mainMenu}>
+            {siteConfig.navLinks.map((link) => (
+              <a key={link.href} href={link.href}>
+                {link.label}
+              </a>
+            ))}
+            <a href={siteConfig.chordsearchUrl}>{copy.nav.chordsearch}</a>
+          </nav>
         </div>
       </header>
 
@@ -691,8 +891,25 @@ export default function ChromaticTuner() {
                   letterSpacing: "-0.03em",
                 }}
               >
-                Chord4 調音器
+                {copy.siteName}
               </h1>
+              <p
+                style={{
+                  margin: "4px 0 0",
+                  fontSize: `${13 * textScale}px`,
+                  color: theme.textMuted,
+                }}
+              >
+                {copy.heroDescription}
+              </p>
+              <div className="tuner-hero-links">
+                {siteConfig.toolLinks.map((link) => (
+                  <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
+                    {link.label}
+                  </a>
+                ))}
+                <span>{copy.heroSearchHint}</span>
+              </div>
             </div>
           </div>
 
@@ -712,13 +929,13 @@ export default function ChromaticTuner() {
                 htmlFor="ref-pitch"
                 style={{ fontSize: `${12 * textScale}px`, color: theme.textMuted }}
               >
-                A4 基準
+                {copy.referencePitch}
               </label>
               <select
                 id="ref-pitch"
                 value={referenceA}
                 onChange={(e) => setReferenceA(Number(e.target.value))}
-                aria-label="A4 基準音高"
+                aria-label={copy.referencePitchAria}
                 style={{
                   background: "transparent",
                   border: "none",
@@ -739,14 +956,14 @@ export default function ChromaticTuner() {
           </div>
         </section>
 
-        <section aria-label="樂器選擇">
+        <section aria-label={copy.instrumentSection}>
           <h2 className="sr-only" style={{ position: "absolute", left: "-9999px" }}>
-            選擇樂器
+            {copy.selectInstrument}
           </h2>
 
           <div style={{ marginBottom: "32px" }}>
             <div className="instrument-grid">
-              {PRIMARY_INSTRUMENTS.map((inst) => {
+              {primaryInstruments.map((inst) => {
                 const isActive = selectedInstrument.id === inst.id;
                 const SVGComponent = InstrumentSVGs[inst.id];
 
@@ -754,7 +971,7 @@ export default function ChromaticTuner() {
                   <button
                     key={inst.id}
                     onClick={() => {
-                      setSelectedInstrument(inst);
+                      setSelectedInstrumentId(inst.id);
                       setSelectedString(null);
                     }}
                     aria-pressed={isActive}
@@ -833,7 +1050,7 @@ export default function ChromaticTuner() {
                   transition,
                 }}
               >
-                {secondaryExpanded ? "收合更多樂器" : "更多樂器"}
+                {secondaryExpanded ? copy.collapseInstruments : copy.moreInstruments}
               </button>
             </div>
 
@@ -843,7 +1060,7 @@ export default function ChromaticTuner() {
                 className="instrument-grid instrument-grid-secondary"
                 style={{ marginTop: "14px" }}
               >
-                {SECONDARY_INSTRUMENTS.map((inst) => {
+                {secondaryInstruments.map((inst) => {
                   const isActive = selectedInstrument.id === inst.id;
                   const SVGComponent = InstrumentSVGs[inst.id];
 
@@ -851,7 +1068,7 @@ export default function ChromaticTuner() {
                     <button
                       key={inst.id}
                       onClick={() => {
-                        setSelectedInstrument(inst);
+                        setSelectedInstrumentId(inst.id);
                         setSelectedString(null);
                       }}
                       aria-pressed={isActive}
@@ -918,7 +1135,7 @@ export default function ChromaticTuner() {
         <div className="tuner-content-grid">
           <div>
             <section
-              aria-label={`${selectedInstrument.name} 詳細資訊`}
+              aria-label={`${selectedInstrument.name} ${copy.detailsSuffix}`}
               style={{
                 background: theme.surface,
                 borderRadius: "20px",
@@ -977,7 +1194,7 @@ export default function ChromaticTuner() {
                             setSelectedString(i);
                             playTone(getNoteFrequency(note));
                           }}
-                          aria-label={`第 ${i + 1} 弦：${note}，點擊可播放參考音`}
+                          aria-label={copy.stringLabel(i, note)}
                           style={{
                             padding: "8px 16px",
                             borderRadius: "10px",
@@ -1015,7 +1232,7 @@ export default function ChromaticTuner() {
             </section>
 
             <section
-              aria-label="調音器顯示區"
+              aria-label={copy.tunerDisplay}
               aria-live="polite"
               style={{
                 background: theme.surface,
@@ -1040,8 +1257,8 @@ export default function ChromaticTuner() {
                 role="meter"
                 aria-label={
                   detectedNote
-                    ? `音準：${detectedNote.cents} 音分，${detectedNote.cents > 0 ? "偏高" : "偏低"}`
-                    : "等待聲音輸入"
+                    ? copy.tuningStatus(detectedNote.cents)
+                    : copy.waitingForInput
                 }
                 aria-valuemin={-50}
                 aria-valuemax={50}
@@ -1138,7 +1355,7 @@ export default function ChromaticTuner() {
                     fontFamily: "inherit",
                   }}
                 >
-                  {detectedNote ? `${detectedNote.frequency.toFixed(1)} Hz` : "請彈奏一個音"}
+                  {detectedNote ? `${detectedNote.frequency.toFixed(1)} Hz` : copy.playPrompt}
                 </span>
               </div>
               <div>
@@ -1177,7 +1394,7 @@ export default function ChromaticTuner() {
                     alignItems: "flex-end",
                     height: 20,
                   }}
-                  aria-label={`輸入音量：${Math.round(volume * 100)}%`}
+                  aria-label={copy.volumeLabel(volume)}
                 >
                   {Array.from({ length: 12 }).map((_, i) => (
                     <div
@@ -1197,7 +1414,7 @@ export default function ChromaticTuner() {
 
               <button
                 onClick={isListening ? stopListening : startListening}
-                aria-label={isListening ? "停止調音" : "開始調音，需要麥克風權限"}
+                aria-label={isListening ? copy.stopTunerAria : copy.startTunerAria}
                 style={{
                   marginTop: "28px",
                   padding: "14px 40px",
@@ -1218,14 +1435,14 @@ export default function ChromaticTuner() {
                   transition,
                 }}
               >
-                {isListening ? "■ 停止調音" : "● 開始調音"}
+                {isListening ? copy.stopTuner : copy.startTuner}
               </button>
             </section>
           </div>
 
           <aside>
             <section
-              aria-label="Tips"
+              aria-label={copy.tipsAria}
               style={{
                 background: theme.surface,
                 borderRadius: "16px",
@@ -1246,7 +1463,7 @@ export default function ChromaticTuner() {
                   letterSpacing: "0.04em",
                 }}
               >
-                使用提示
+                {copy.tipsTitle}
               </h3>
               <div
                 style={{
@@ -1256,10 +1473,10 @@ export default function ChromaticTuner() {
                 }}
               >
                 {[
-                  { icon: "🎯", text: "預設提供吉他、貝斯與烏克麗麗，其餘樂器可從更多樂器展開。" },
-                  { icon: "🎤", text: "點擊開始調音並允許瀏覽器存取本機麥克風。" },
-                  { icon: "🎵", text: "彈奏單音後，中央指示條會顯示目前偏高或偏低。" },
-                  { icon: "🔊", text: "點擊弦音按鈕可播放對應參考音，方便快速校準。" },
+                  { icon: "🎯", text: copy.tips[0] },
+                  { icon: "🎤", text: copy.tips[1] },
+                  { icon: "🎵", text: copy.tips[2] },
+                  { icon: "🔊", text: copy.tips[3] },
                 ].map((tip, i) => (
                   <div
                     key={i}
@@ -1294,7 +1511,7 @@ export default function ChromaticTuner() {
         <footer className="chord4-footer">
           <div className="desktop-only chord4-footer-desktop">
             <div className="chord4-referral-links">
-              <span>友情鏈接：</span>
+              <span>{copy.footerLinksLabel}</span>
               <div className="chord4-referral-list">
                 {CHORD4_REFERRAL_LINKS.map((link) => (
                   <a
@@ -1303,34 +1520,34 @@ export default function ChromaticTuner() {
                     target="_blank"
                     rel="nofollow ugc noreferrer"
                   >
-                    {link.label}
+                    {link.labels[locale]}
                   </a>
                 ))}
               </div>
             </div>
 
             <div className="chord4-footer-meta">
-              <p>免責聲明！本站內容僅供吉他愛好者學習之用。聯繫方式：contact@chord4.com</p>
+              <p>{copy.disclaimer}</p>
               <p>
-                <a href="https://chord4.com/sitemap.xml">網站地圖</a>
-                <span> / chord4.com / designed by reecho @2012-2026</span>
+                <a href="https://chord4.com/sitemap.xml">{copy.sitemap}</a>
+                <span>{copy.designedBy}</span>
               </p>
               <p>
-                <a href={CHORD4_CHORDSEARCH_URL}>和弦搜尋</a>
-                <span> / 基於 PitchCraft 開源專案改作 · 保留 PitchCraft 引用資訊 · MIT License</span>
+                <a href={siteConfig.chordsearchUrl}>{copy.nav.chordsearch}</a>
+                <span>{copy.openSource}</span>
               </p>
             </div>
           </div>
 
           <div className="mobile-only chord4-footer-mobile">
             <p>
-              chord4.com手機版本 /
-              <a href="https://chord4.com/sitemap.xml">網站地圖</a>
+              {copy.mobileVersion} /
+              <a href="https://chord4.com/sitemap.xml">{copy.sitemap}</a>
               /
-              <a href={CHORD4_CHORDSEARCH_URL}>和弦搜尋</a>
+              <a href={siteConfig.chordsearchUrl}>{copy.nav.chordsearch}</a>
               /@2012-2026
             </p>
-            <p>基於 PitchCraft 開源專案改作 · PitchCraft · MIT License</p>
+            <p>{copy.mobileOpenSource}</p>
           </div>
         </footer>
       </div>
