@@ -176,17 +176,21 @@ button:focus-visible {
 
 .chord4-mobile-header {
   padding: 10px 14px 16px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
 }
 
 .chord4-mobile-brand-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 
 .chord4-search-form-mobile {
-  margin-bottom: 12px;
+  margin-bottom: 0;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -209,8 +213,10 @@ button:focus-visible {
 }
 
 .chord4-mobile-nav {
+  grid-column: 1 / -1;
   flex-wrap: wrap;
   gap: 8px;
+  margin-top: 4px;
 }
 
 .chord4-mobile-nav a {
@@ -339,6 +345,14 @@ button:focus-visible {
 }
 
 @media (max-width: 1023px) {
+  .instrument-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .instrument-grid-secondary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .chord4-referral-links {
     flex-direction: column;
   }
