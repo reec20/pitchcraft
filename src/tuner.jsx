@@ -63,6 +63,38 @@ const INSTRUMENT_DEFINITIONS = [
 
 const PRIMARY_INSTRUMENT_IDS = ["guitar", "bass", "ukulele"];
 
+const GUITAR_TUNINGS = [
+  {
+    id: "standard",
+    notes: ["E2", "A2", "D3", "G3", "B3", "E4"],
+  },
+  {
+    id: "halfStepDown",
+    notes: ["D#2", "G#2", "C#3", "F#3", "A#3", "D#4"],
+    display: ["E♭2", "A♭2", "D♭3", "G♭3", "B♭3", "E♭4"],
+  },
+  {
+    id: "dropD",
+    notes: ["D2", "A2", "D3", "G3", "B3", "E4"],
+  },
+  {
+    id: "openD",
+    notes: ["D2", "A2", "D3", "F#3", "A3", "D4"],
+  },
+  {
+    id: "openG",
+    notes: ["D2", "G2", "D3", "G3", "B3", "D4"],
+  },
+  {
+    id: "dadgad",
+    notes: ["D2", "A2", "D3", "G3", "A3", "D4"],
+  },
+  {
+    id: "cgdgad",
+    notes: ["C2", "G2", "D3", "G3", "A3", "D4"],
+  },
+];
+
 const COPY = {
   "zh-Hant": {
     documentTitle: "Chord4調音器",
@@ -88,6 +120,8 @@ const COPY = {
     moreInstruments: "更多樂器",
     collapseInstruments: "收合更多樂器",
     detailsSuffix: "詳細資訊",
+    tuningSection: "調弦模式",
+    tuningLabel: (name, notes) => `調弦模式 ${name}：${notes}`,
     stringLabel: (index, note) => `第 ${index + 1} 弦：${note}，點擊可播放參考音`,
     tunerDisplay: "調音器顯示區",
     tuningStatus: (cents) => `音準：${cents} 音分，${cents > 0 ? "偏高" : "偏低"}`,
@@ -105,6 +139,7 @@ const COPY = {
       "點擊開始調音並允許瀏覽器存取本機麥克風。",
       "彈奏單音後，中央指示條會顯示目前偏高或偏低。",
       "點擊弦音按鈕可播放對應參考音，方便快速校準。",
+      "吉他支援標準、降半音、Drop D、Open D/G、DADGAD、CGDGAD 等調弦模式，可一鍵切換。",
     ],
     footerLinksLabel: "友情鏈接：",
     disclaimer: "免責聲明！本站內容僅供吉他愛好者學習之用。聯繫方式：contact@chord4.com",
@@ -128,6 +163,36 @@ const COPY = {
       banjo: { name: "班卓琴", description: "Open G 調音" },
       mandolin: { name: "曼陀林", description: "標準調音" },
       chromatic: { name: "半音階", description: "所有音高，適用任何樂器" },
+    },
+    guitarTunings: {
+      standard: {
+        name: "標準",
+        description: "標準調弦 EADGBE，最通用的模式，絕大多數教材與和弦把位基於此",
+      },
+      halfStepDown: {
+        name: "降半音 E♭",
+        description: "全弦統一降半音，音色更厚重，常見於搖滾／重金屬，也便於降低演唱音域",
+      },
+      dropD: {
+        name: "Drop D",
+        description: "僅第 6 弦由 E 降至 D，可單指按出強力和弦，適合有力的低音 Riff",
+      },
+      openD: {
+        name: "Open D",
+        description: "空弦即 D 大三和弦（DADF#AD），常用於民謠、藍調與指彈",
+      },
+      openG: {
+        name: "Open G",
+        description: "空弦即 G 大三和弦（DGDGBD），常用於藍調與滑棒吉他",
+      },
+      dadgad: {
+        name: "DADGAD",
+        description: "空弦構成開放 Dsus4，凱爾特音樂與現代指彈常用，音色空靈",
+      },
+      cgdgad: {
+        name: "CGDGAD",
+        description: "低音降至 C 的指彈調弦，深受 Pierre Bensusan 等現代指彈吉他手喜愛",
+      },
     },
   },
   "zh-Hans": {
@@ -154,6 +219,8 @@ const COPY = {
     moreInstruments: "更多乐器",
     collapseInstruments: "收起更多乐器",
     detailsSuffix: "详细信息",
+    tuningSection: "调弦模式",
+    tuningLabel: (name, notes) => `调弦模式 ${name}：${notes}`,
     stringLabel: (index, note) => `第 ${index + 1} 弦：${note}，点击可播放参考音`,
     tunerDisplay: "调音器显示区",
     tuningStatus: (cents) => `音准：${cents} 音分，${cents > 0 ? "偏高" : "偏低"}`,
@@ -171,6 +238,7 @@ const COPY = {
       "点击开始调音并允许浏览器访问本机麦克风。",
       "弹奏单音后，中央指示条会显示当前偏高或偏低。",
       "点击弦音按钮可播放对应参考音，方便快速校准。",
+      "吉他支持标准、降半音、Drop D、Open D/G、DADGAD、CGDGAD 等调弦模式，可一键切换。",
     ],
     footerLinksLabel: "友情链接：",
     disclaimer: "免责声明！本站内容仅供吉他爱好者学习之用。联系方式：contact@chord4.com",
@@ -194,6 +262,36 @@ const COPY = {
       banjo: { name: "班卓琴", description: "Open G 调音" },
       mandolin: { name: "曼陀林", description: "标准调音" },
       chromatic: { name: "半音阶", description: "所有音高，适用于任何乐器" },
+    },
+    guitarTunings: {
+      standard: {
+        name: "标准",
+        description: "标准调弦 EADGBE，最通用的模式，绝大多数教材与和弦把位基于此",
+      },
+      halfStepDown: {
+        name: "降半音 E♭",
+        description: "全弦统一降半音，音色更厚重，常见于摇滚／重金属，也便于降低演唱音域",
+      },
+      dropD: {
+        name: "Drop D",
+        description: "仅第 6 弦由 E 降至 D，可单指按出强力和弦，适合有力的低音 Riff",
+      },
+      openD: {
+        name: "Open D",
+        description: "空弦即 D 大三和弦（DADF#AD），常用于民谣、布鲁斯与指弹",
+      },
+      openG: {
+        name: "Open G",
+        description: "空弦即 G 大三和弦（DGDGBD），常用于布鲁斯与滑棒吉他",
+      },
+      dadgad: {
+        name: "DADGAD",
+        description: "空弦构成开放 Dsus4，凯尔特音乐与现代指弹常用，音色空灵",
+      },
+      cgdgad: {
+        name: "CGDGAD",
+        description: "低音降至 C 的指弹调弦，深受 Pierre Bensusan 等现代指弹吉他手喜爱",
+      },
     },
   },
 };
@@ -611,6 +709,7 @@ export default function ChromaticTuner() {
   );
 
   const [selectedInstrumentId, setSelectedInstrumentId] = useState(INSTRUMENT_DEFINITIONS[0].id);
+  const [selectedTuningId, setSelectedTuningId] = useState(GUITAR_TUNINGS[0].id);
   const [isListening, setIsListening] = useState(false);
   const [detectedNote, setDetectedNote] = useState(null);
   const [referenceA, setReferenceA] = useState(440);
@@ -629,6 +728,17 @@ export default function ChromaticTuner() {
   const secondaryExpanded = showMoreInstruments || secondaryInstruments.some(
     (instrument) => instrument.id === selectedInstrument.id
   );
+
+  const isGuitar = selectedInstrument.id === "guitar";
+  const selectedTuning =
+    GUITAR_TUNINGS.find((tuning) => tuning.id === selectedTuningId) || GUITAR_TUNINGS[0];
+  const tuningNotes = isGuitar ? selectedTuning.notes : selectedInstrument.tuning;
+  const tuningDisplay = isGuitar
+    ? selectedTuning.display || selectedTuning.notes
+    : selectedInstrument.tuning;
+  const instrumentDescription = isGuitar
+    ? copy.guitarTunings[selectedTuning.id].description
+    : selectedInstrument.description;
 
   const autoCorrelate = useCallback((buf, sampleRate) => {
     let size = buf.length;
@@ -1158,22 +1268,77 @@ export default function ChromaticTuner() {
                     fontSize: `${13 * textScale}px`,
                   }}
                 >
-                  {selectedInstrument.description}
+                  {instrumentDescription}
                 </p>
 
-                {selectedInstrument.tuning.length > 0 && (
+                {isGuitar && (
+                  <div style={{ marginBottom: "16px" }}>
+                    <h3
+                      style={{
+                        margin: "0 0 8px 0",
+                        fontSize: `${12 * textScale}px`,
+                        fontWeight: 700,
+                        color: theme.textMuted,
+                        letterSpacing: "0.04em",
+                      }}
+                    >
+                      {copy.tuningSection}
+                    </h3>
+                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                      {GUITAR_TUNINGS.map((tuning) => {
+                        const isActive = selectedTuning.id === tuning.id;
+                        const tuningCopy = copy.guitarTunings[tuning.id];
+                        const noteSummary = (tuning.display || tuning.notes)
+                          .map((note) => note.replace(/[0-9]/g, ""))
+                          .join(" ");
+
+                        return (
+                          <button
+                            key={tuning.id}
+                            onClick={() => {
+                              setSelectedTuningId(tuning.id);
+                              setSelectedString(null);
+                            }}
+                            aria-pressed={isActive}
+                            aria-label={copy.tuningLabel(tuningCopy.name, noteSummary)}
+                            title={`${noteSummary} · ${tuningCopy.description}`}
+                            style={{
+                              padding: "7px 14px",
+                              borderRadius: "999px",
+                              border: `2px solid ${isActive ? selectedInstrument.color : theme.border}`,
+                              background: isActive
+                                ? selectedInstrument.color + "22"
+                                : theme.surfaceAlt,
+                              color: isActive ? selectedInstrument.color : theme.text,
+                              cursor: "pointer",
+                              fontFamily: "inherit",
+                              fontSize: `${12 * textScale}px`,
+                              fontWeight: isActive ? 700 : 500,
+                              transition,
+                            }}
+                          >
+                            {tuningCopy.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {tuningNotes.length > 0 && (
                   <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                    {selectedInstrument.tuning.map((note, i) => {
+                    {tuningNotes.map((note, i) => {
                       const isSelected = selectedString === i;
+                      const displayNote = tuningDisplay[i];
 
                       return (
                         <button
-                          key={i}
+                          key={`${note}-${i}`}
                           onClick={() => {
                             setSelectedString(i);
                             playTone(getNoteFrequency(note));
                           }}
-                          aria-label={copy.stringLabel(i, note)}
+                          aria-label={copy.stringLabel(i, displayNote)}
                           style={{
                             padding: "8px 16px",
                             borderRadius: "10px",
@@ -1192,7 +1357,7 @@ export default function ChromaticTuner() {
                             minWidth: 52,
                           }}
                         >
-                          <span>{note}</span>
+                          <span>{displayNote}</span>
                           <span
                             style={{
                               fontSize: `${9 * textScale}px`,
@@ -1456,6 +1621,7 @@ export default function ChromaticTuner() {
                   { icon: "🎤", text: copy.tips[1] },
                   { icon: "🎵", text: copy.tips[2] },
                   { icon: "🔊", text: copy.tips[3] },
+                  { icon: "🎸", text: copy.tips[4] },
                 ].map((tip, i) => (
                   <div
                     key={i}
