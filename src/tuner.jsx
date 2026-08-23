@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { getDisplayedNoteName, getGuitarStringNumber } from "./tuning-utils.js";
 
 const NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
@@ -122,7 +123,8 @@ const COPY = {
     detailsSuffix: "詳細資訊",
     tuningSection: "調弦模式",
     tuningLabel: (name, notes) => `調弦模式 ${name}：${notes}`,
-    stringLabel: (index, note) => `第 ${index + 1} 弦：${note}，點擊可播放參考音`,
+    stringNumber: (number) => `第${number}弦`,
+    stringLabel: (number, note) => `第 ${number} 弦：${note}，點擊可播放參考音`,
     tunerDisplay: "調音器顯示區",
     tuningStatus: (cents) => `音準：${cents} 音分，${cents > 0 ? "偏高" : "偏低"}`,
     waitingForInput: "等待聲音輸入",
@@ -221,7 +223,8 @@ const COPY = {
     detailsSuffix: "详细信息",
     tuningSection: "调弦模式",
     tuningLabel: (name, notes) => `调弦模式 ${name}：${notes}`,
-    stringLabel: (index, note) => `第 ${index + 1} 弦：${note}，点击可播放参考音`,
+    stringNumber: (number) => `第${number}弦`,
+    stringLabel: (number, note) => `第 ${number} 弦：${note}，点击可播放参考音`,
     tunerDisplay: "调音器显示区",
     tuningStatus: (cents) => `音准：${cents} 音分，${cents > 0 ? "偏高" : "偏低"}`,
     waitingForInput: "等待声音输入",
@@ -736,6 +739,10 @@ export default function ChromaticTuner() {
   const tuningDisplay = isGuitar
     ? selectedTuning.display || selectedTuning.notes
     : selectedInstrument.tuning;
+  const preferFlats = isGuitar && selectedTuning.id === "halfStepDown";
+  const detectedNoteName = detectedNote
+    ? getDisplayedNoteName(detectedNote.note, preferFlats)
+    : null;
   const instrumentDescription = isGuitar
     ? copy.guitarTunings[selectedTuning.id].description
     : selectedInstrument.description;
@@ -1330,6 +1337,7 @@ export default function ChromaticTuner() {
                     {tuningNotes.map((note, i) => {
                       const isSelected = selectedString === i;
                       const displayNote = tuningDisplay[i];
+                      const stringNumber = isGuitar ? getGuitarStringNumber(i) : i + 1;
 
                       return (
                         <button
@@ -1338,7 +1346,7 @@ export default function ChromaticTuner() {
                             setSelectedString(i);
                             playTone(getNoteFrequency(note));
                           }}
-                          aria-label={copy.stringLabel(i, displayNote)}
+                          aria-label={copy.stringLabel(stringNumber, displayNote)}
                           style={{
                             padding: "8px 16px",
                             borderRadius: "10px",
@@ -1358,6 +1366,17 @@ export default function ChromaticTuner() {
                           }}
                         >
                           <span>{displayNote}</span>
+                          {isGuitar && (
+                            <span
+                              style={{
+                                fontSize: `${9 * textScale}px`,
+                                color: theme.textMuted,
+                                fontWeight: 600,
+                              }}
+                            >
+                              {copy.stringNumber(stringNumber)}
+                            </span>
+                          )}
                           <span
                             style={{
                               fontSize: `${9 * textScale}px`,
@@ -1477,7 +1496,7 @@ export default function ChromaticTuner() {
                       : "none",
                   }}
                 >
-                  {detectedNote ? detectedNote.note : "—"}
+                  {detectedNoteName || "—"}
                 </span>
                 <span
                   style={{
